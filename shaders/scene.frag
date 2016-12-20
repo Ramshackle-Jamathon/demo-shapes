@@ -24,7 +24,7 @@ float sdSphere( vec3 p, float s )
 	return length(p)-s;
 }
 float displacement( vec3 p ){
-	float n = cos(uGlobalTime) * 6.0;
+	float n = cos(uGlobalTime) * 4.0;
 	return sin(n*p.x)*sin(n*p.y)*sin(n*p.z);
 }
 float opDisplaceSphere( vec3 p )
