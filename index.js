@@ -57,12 +57,10 @@ const demo = {
 		this.shader.uniforms.uCamUp = vectorUp;
 		this.shader.uniforms.uCamDir = vectorDir;
 
-		this.shader.uniforms.uGlobalTime += dt / 3000;
-		this.shader.uniforms.uMinimumDistance = 0.005;
-		this.shader.uniforms.uNormalDistance = 1.3;
-		this.shader.uniforms.uAnaglyph = 0;
-		this.shader.uniforms.uForms = 3;
-		this.shader.uniforms.uSpaceFolding = 1;
+		const normalDt = this.ellapsedTime / 3000;
+		this.shader.uniforms.uGlobalTime = normalDt;
+		this.shader.uniforms.uSinGlobalTime = Math.sin(normalDt);
+		this.shader.uniforms.uCosGlobalTime = Math.cos(normalDt);
 
 		//Draw
 		this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
@@ -115,10 +113,10 @@ const demo = {
 	},
 	init: function(){
 		this.createContext();
-		this.canvas.width  = window.innerWidth * this.quality;
-		this.canvas.height = window.innerHeight * this.quality;
 		this.canvas.style.width  = "100%";
 		this.canvas.style.height = "100%";
+		this.resizeCanvas();
+		
 		document.body.appendChild( this.stats.dom );
 		this.controls.start();
 		//Create full screen vertex buffer

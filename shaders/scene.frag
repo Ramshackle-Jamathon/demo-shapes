@@ -2,6 +2,8 @@
 precision mediump float;
 
 uniform float uGlobalTime;
+uniform float uCosGlobalTime;
+uniform float uSinGlobalTime;
 uniform vec2 uResolution;
 
 uniform vec3 uCamPosition;
@@ -10,6 +12,8 @@ uniform vec3 uCamUp;
 
 varying vec2 uv;
 #define FieldOfView 1.0
+#define MaxSteps 128
+#define MinimumDistance 0.01
 
 //-----------------Main functions--------------------
 
@@ -24,7 +28,7 @@ float sdSphere( vec3 p, float s )
 	return length(p)-s;
 }
 float displacement( vec3 p ){
-	float n = cos(uGlobalTime) * 4.0;
+	float n = uCosGlobalTime * 4.0;
 	return sin(n*p.x)*sin(n*p.y)*sin(n*p.z);
 }
 float opDisplaceSphere( vec3 p )
@@ -41,7 +45,7 @@ float rTorus( vec3 p, vec2 t )
 }
 float opTwistyTaurus( vec3 p )
 {
-	float n = sin(uGlobalTime);
+	float n = uSinGlobalTime;
     float c = cos(1.1*p.y*n);
     float s = sin(1.1*p.y*n);
     mat2 m = mat2(c,-s,s,c);
@@ -74,7 +78,8 @@ float opRep( vec3 p, vec3 c )
 float trace(vec3 ro, vec3 rt)
 {
 	float t = 0.0;
-	
+	float distance = 0.0;
+	int steps = 0;
 	//Loop through (in this case 32 times)
 	for(int i = 0; i < 128; ++i)
 	{
@@ -82,6 +87,7 @@ float trace(vec3 ro, vec3 rt)
 		vec3 p = ro + rt * t;
 		//Get the value for the distance field
 		float d = opRep(p, vec3(10.0,10.0,10.0));
+		if (d < MinimumDistance){ break; }
 
 		t += d * 0.5;
 	}
@@ -115,5 +121,5 @@ void main()
 	//Call the fogging function to apply some depth to the image
 	t = opFog(t);
 
-	gl_FragColor = vec4(t * cos(uGlobalTime),t,t * sin(uGlobalTime),1.0);
+	gl_FragColor = vec4(t * uCosGlobalTime,t,t * uSinGlobalTime,1.0);
 }
